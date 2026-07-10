@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Evaluasi Lab Alkimia Pecahan - SMP Kelas VII</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <!-- Google Fonts: Fredoka & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for beautiful math notation -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Poppins', 'Fredoka', sans-serif;
+        }
+        .title-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0d9488;
+            border-radius: 6px;
+            border: 2px solid #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0f766e;
+        }
+        /* Comic book style shadow */
+        .comic-shadow {
+            box-shadow: 6px 6px 0px 0px #0f172a;
+        }
+        .comic-shadow-sm {
+            box-shadow: 4px 4px 0px 0px #0f172a;
+        }
+        .comic-btn-active:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #0f172a;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#f0fdf4] via-[#ecfeff] to-[#f5f3ff] text-slate-800 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <script>
+        const SoundFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playClick() {
+                this.init();
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.09);
+            },
+            playSuccess() {
+                this.init();
+                let now = this.ctx.currentTime;
+                let notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    let osc = this.ctx.createOscillator();
+                    let gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                    gain.gain.setValueAtTime(0.06, now + idx * 0.07);
+                    gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.07 + 0.12);
+                    osc.start(now + idx * 0.07);
+                    osc.stop(now + idx * 0.07 + 0.15);
+                });
+            },
+            playWrong() {
+                this.init();
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.21);
+            },
+            playFanfare() {
+                this.init();
+                let now = this.ctx.currentTime;
+                let chords = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+                chords.forEach((freq, idx) => {
+                    let osc = this.ctx.createOscillator();
+                    let gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.8, now + 0.8);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+                    osc.start(now);
+                    osc.stop(now + 0.8);
+                });
+            }
+        };
+
+        const QuestionsDatabase = [
+            // --- 20 SOAL PERKALIAN & PEMBAGIAN (1-20) ---
+            {
+                id: 1,
+                type: "Langsung",
+                text: "Berapakah hasil dari operasi perkalian pecahan berikut? <br> $ \\frac{2}{3} \\times \\frac{4}{5} = ... $",
+                options: ["$ \\frac{8}{15} $", "$ \\frac{6}{15} $", "$ \\frac{8}{8} $", "$ \\frac{6}{8} $"],
+                answer: "$ \\frac{8}{15} $",
+                hint: "Kalikan langsung bagian pembilang (atas) dengan pembilang, lalu penyebut (bawah) dengan penyebut: $ 2 \\times 4 $ dan $ 3 \\times 5 $.",
+                explanation: "Langkah penyelesaian: <br> Pembilang: $ 2 \\times 4 = 8 $ <br> Penyebut: $ 3 \\times 5 = 15 $ <br> Diperoleh hasil: $ \\frac{8}{15} $."
+            },
+            {
+                id: 2,
+                type: "Langsung",
+                text: "Tentukan hasil dari pembagian pecahan berikut! <br> $ \\frac{3}{7} \\div \\frac{2}{5} = ... $",
+                options: ["$ \\frac{15}{14} $", "$ \\frac{6}{35} $", "$ \\frac{10}{21} $", "$ \\frac{5}{14} $"],
+                answer: "$ \\frac{15}{14} $",
+                hint: "Gunakan taktik <strong>Keep-Change-Flip</strong>. Biarkan pecahan pertama tetap, ganti tanda bagi menjadi kali, lalu balik pecahan kedua.",
+                explanation: "Langkah penyelesaian: <br> Ubah ke perkalian: $ \\frac{3}{7} \\times \\frac{5}{2} $ <br> Kalikan pembilang: $ 3 \\times 5 = 15 $ <br> Kalikan penyebut: $ 7 \\times 2 = 14 $ <br> Hasil: $ \\frac{15}{14} $ (atau senilai dengan $ 1\\frac{1}{14} $)."
+            },
+            {
+                id: 3,
+                type: "Langsung",
+                text: "Berapakah hasil dari perkalian pecahan campuran dengan pecahan biasa berikut? <br> $ 1\\frac{1}{2} \\times \\frac{2}{3} = ... $",
+                options: ["$ 1 $", "$ \\frac{3}{4} $", "$ 1\\frac{1}{3} $", "$ \\frac{5}{6} $"],
+                answer: "$ 1 $",
+                hint: "Ubah dahulu pecahan campuran $ 1\\frac{1}{2} $ menjadi pecahan biasa, kemudian kalikan langsung pembilang dan penyebutnya.",
+                explanation: "Langkah penyelesaian: <br> Ubah $ 1\\frac{1}{2} $ menjadi $ \\frac{(1 \\times 2) + 1}{2} = \\frac{3}{2} $. <br> Kalikan: $ \\frac{3}{2} \\times \\frac{2}{3} = \\frac{6}{6} = 1 $."
+            },
+            {
+                id: 4,
+                type: "Langsung",
+                text: "Selesaikan operasi pembagian pecahan campuran berikut! <br> $ 2\\frac{1}{4} \\div 1\\frac{1}{2} = ... $",
+                options: ["$ 1\\frac{1}{2} $", "$ 1\\frac{1}{4} $", "$ 2\\frac{1}{2} $", "$ \\frac{3}{4} $"],
+                answer: "$ 1\\frac{1}{2} $",
+                hint: "Ubah kedua pecahan campuran menjadi pecahan biasa terlebih dahulu, lalu lakukan pembagian dengan metode <strong>Keep-Change-Flip</strong>.",
+                explanation: "Langkah penyelesaian: <br> $ 2\\frac{1}{4} = \\frac{9}{4} $ dan $ 1\\frac{1}{2} = \\frac{3}{2} $. <br> Lakukan pembagian: $ \\frac{9}{4} \\div \\frac{3}{2} = \\frac{9}{4} \\times \\frac{2}{3} $ <br> Kalikan: $ \\frac{18}{12} = \\frac{3}{2} = 1\\frac{1}{2} $."
+            },
+            {
+                id: 5,
+                type: "Langsung",
+                text: "Tentukan hasil dari perkalian pecahan biasa dengan pecahan campuran berikut! <br> $ \\frac{5}{6} \\times 1\\frac{1}{5} = ... $",
+                options: ["$ 1 $", "$ 1\\frac{1}{6} $", "$ \\frac{25}{36} $", "$ \\frac{5}{6} $"],
+                answer: "$ 1 $",
+                hint: "Pecahan campuran $ 1\\frac{1}{5} $ setara dengan $ \\frac{6}{5} $. Lakukan perkalian silang atau kalikan pembilang dan penyebut secara langsung.",
+                explanation: "Langkah penyelesaian: <br> Ubah $ 1\\frac{1}{5} $ menjadi $ \\frac{6}{5} $. <br> Kalikan: $ \\frac{5}{6} \\times \\frac{6}{5} = \\frac{30}{30} = 1 $."
+            },
+            {
+                id: 6,
+                type: "Langsung",
+                text: "Berapakah hasil dari pembagian bilangan bulat dengan pecahan berikut? <br> $ 3 \\div \\frac{3}{4} = ... $",
+                options: ["$ 4 $", "$ 2\\frac{1}{4} $", "$ 12 $", "$ \\frac{9}{4} $"],
+                answer: "$ 4 $",
+                hint: "Bilangan bulat $ 3 $ dapat ditulis sebagai $ \\frac{3}{1} $. Ubah operasi pembagian menjadi perkalian dengan membalik pecahan kedua.",
+                explanation: "Langkah penyelesaian: <br> Bentuk operasi: $ \\frac{3}{1} \\div \\frac{3}{4} = \\frac{3}{1} \\times \\frac{4}{3} $ <br> Kalikan langsung: $ \\frac{12}{3} = 4 $."
+            },
+            {
+                id: 7,
+                type: "Langsung",
+                text: "Hitunglah nilai dari perkalian pecahan berikut! <br> $ \\frac{4}{9} \\times 2\\frac{1}{4} = ... $",
+                options: ["$ 1 $", "$ \\frac{8}{9} $", "$ 1\\frac{1}{9} $", "$ \\frac{16}{36} $"],
+                answer: "$ 1 $",
+                hint: "Ubah $ 2\\frac{1}{4} $ menjadi pecahan biasa, kemudian kalikan dengan $ \\frac{4}{9} $.",
+                explanation: "Langkah penyelesaian: <br> Ubah $ 2\\frac{1}{4} $ menjadi $ \\frac{9}{4} $. <br> Kalikan: $ \\frac{4}{9} \\times \\frac{9}{4} = \\frac{36}{36} = 1 $."
+            },
+            {
+                id: 8,
+                type: "Langsung",
+                text: "Berapakah hasil dari pembagian pecahan campuran dengan pecahan biasa berikut? <br> $ 1\\frac{3}{5} \\div \\frac{4}{5} = ... $",
+                options: ["$ 2 $", "$ 1\\frac{1}{5} $", "$ 1\\frac{12}{25} $", "$ \\frac{1}{2} $"],
+                answer: "$ 2 $",
+                hint: "Pecahan campuran $ 1\\frac{3}{5} $ diubah dahulu menjadi pecahan biasa sebelum dikalikan silang.",
+                explanation: "Langkah penyelesaian: <br> $ 1\\frac{3}{5} = \\frac{8}{5} $. <br> Lakukan pembagian: $ \\frac{8}{5} \\div \\frac{4}{5} = \\frac{8}{5} \\times \\frac{5}{4} $ <br> Sederhanakan: $ \\frac{40}{20} = 2 $."
+            },
+            {
+                id: 9,
+                type: "Langsung",
+                text: "Sederhanakan hasil perkalian pecahan berikut! <br> $ \\frac{7}{10} \\times \\frac{5}{14} = ... $",
+                options: ["$ \\frac{1}{4} $", "$ \\frac{35}{140} $", "$ \\frac{1}{2} $", "$ \\frac{2}{5} $"],
+                answer: "$ \\frac{1}{4} $",
+                hint: "Gunakan penyederhanaan silang: $ 7 $ dan $ 14 $ masing-masing dibagi $ 7 $, sedangkan $ 5 $ dan $ 10 $ masing-masing dibagi $ 5 $.",
+                explanation: "Langkah penyelesaian: <br> Kalikan pembilang: $ 7 \\times 5 = 35 $ <br> Kalikan penyebut: $ 10 \\times 14 = 140 $ <br> Sederhanakan $ \\frac{35}{140} $ dengan membagi pembilang dan penyebut dengan $ 35 $ diperoleh $ \\frac{1}{4} $."
+            },
+            {
+                id: 10,
+                type: "Langsung",
+                text: "Berapakah hasil pembagian pecahan campuran berikut? <br> $ 2\\frac{2}{3} \\div 1\\frac{1}{9} = ... $",
+                options: ["$ 2\\frac{2}{5} $", "$ 2 $", "$ 1\\frac{2}{3} $", "$ 2\\frac{1}{2} $"],
+                answer: "$ 2\\frac{2}{5} $",
+                hint: "Ubah kedua bilangan campuran menjadi pecahan biasa: $ 2\\frac{2}{3} $ menjadi $ \\frac{8}{3} $ dan $ 1\\frac{1}{9} $ menjadi $ \\frac{10}{9} $.",
+                explanation: "Langkah penyelesaian: <br> Operasi menjadi: $ \\frac{8}{3} \\div \\frac{10}{9} = \\frac{8}{3} \\times \\frac{9}{10} $ <br> Kalikan: $ \\frac{72}{30} = \\frac{12}{5} = 2\\frac{2}{5} $."
+            },
+            {
+                id: 11,
+                type: "Langsung",
+                text: "Hitunglah hasil operasi campuran pecahan berikut! <br> $ \\frac{3}{8} \\times \\frac{4}{5} \\div \\frac{3}{10} = ... $",
+                options: ["$ 1 $", "$ \\frac{1}{2} $", "$ 1\\frac{1}{5} $", "$ \\frac{9}{100} $"],
+                answer: "$ 1 $",
+                hint: "Kerjakan berurutan dari kiri ke kanan. Lakukan perkalian terlebih dahulu, lalu hasil perkalian dibagi dengan pecahan terakhir.",
+                explanation: "Langkah penyelesaian: <br> Perkalian: $ \\frac{3}{8} \\times \\frac{4}{5} = \\frac{12}{40} = \\frac{3}{10} $. <br> Pembagian: $ \\frac{3}{10} \\div \\frac{3}{10} = 1 $."
+            },
+            {
+                id: 12,
+                type: "Langsung",
+                text: "Selesaikan operasi hitung pecahan berikut! <br> $ \\left(\\frac{1}{2} \\times \\frac{4}{5}\\right) \\div \\frac{2}{3} = ... $",
+                options: ["$ \\frac{3}{5} $", "$ \\frac{4}{15} $", "$ \\frac{4}{5} $", "$ 1 $"],
+                answer: "$ \\frac{3}{5} $",
+                hint: "Kerjakan operasi di dalam tanda kurung terlebih dahulu, lalu kalikan balik dengan pecahan pembagi di luar tanda kurung.",
+                explanation: "Langkah penyelesaian: <br> Di dalam kurung: $ \\frac{1}{2} \\times \\frac{4}{5} = \\frac{4}{10} = \\frac{2}{5} $. <br> Pembagian: $ \\frac{2}{5} \\div \\frac{2}{3} = \\frac{2}{5} \\times \\frac{3}{2} = \\frac{6}{10} = \\frac{3}{5} $."
+            },
+            {
+                id: 13,
+                type: "Langsung",
+                text: "Berapakah hasil dari operasi perkalian pecahan campuran berikut? <br> $ 4\\frac{1}{2} \\times \\frac{2}{9} = ... $",
+                options: ["$ 1 $", "$ \\frac{8}{18} $", "$ 2 $", "$ 1\\frac{1}{9} $"],
+                answer: "$ 1 $",
+                hint: "Konversikan $ 4\\frac{1}{2} $ menjadi pecahan biasa terlebih dahulu, lalu lakukan perkalian langsung atau pembagian silang.",
+                explanation: "Langkah penyelesaian: <br> $ 4\\frac{1}{2} = \\frac{9}{2} $. <br> Kalikan: $ \\frac{9}{2} \\times \\frac{2}{9} = \\frac{18}{18} = 1 $."
+            },
+            {
+                id: 14,
+                type: "Langsung",
+                text: "Hitunglah hasil dari pembagian pecahan biasa dengan pecahan campuran berikut! <br> $ \\frac{8}{15} \\div 2\\frac{2}{3} = ... $",
+                options: ["$ \\frac{1}{5} $", "$ 1\\frac{11}{25} $", "$ \\frac{2}{5} $", "$ \\frac{1}{3} $"],
+                answer: "$ \\frac{1}{5} $",
+                hint: "Ubah dahulu pembagi $ 2\\frac{2}{3} $ ke bentuk pecahan biasa $ \\frac{8}{3} $ sebelum dibalik.",
+                explanation: "Langkah penyelesaian: <br> $ 2\\frac{2}{3} = \\frac{8}{3} $. <br> Operasi: $ \\frac{8}{15} \\div \\frac{8}{3} = \\frac{8}{15} \\times \\frac{3}{8} $ <br> Sederhanakan silang (angka 8 dicoret): $ \\frac{3}{15} = \\frac{1}{5} $."
+            },
+            {
+                id: 15,
+                type: "Langsung",
+                text: "Berapakah hasil perkalian pecahan campuran berikut? <br> $ 5\\frac{5}{8} \\times \\frac{4}{15} = ... $",
+                options: ["$ 1\\frac{1}{2} $", "$ 1\\frac{2}{3} $", "$ \\frac{3}{2} $", "$ 1\\frac{1}{8} $"],
+                answer: "$ 1\\frac{1}{2} $",
+                hint: "Ubah $ 5\\frac{5}{8} $ menjadi pecahan biasa $ \\frac{45}{8} $ lalu kalikan dengan $ \\frac{4}{15} $.",
+                explanation: "Langkah penyelesaian: <br> Ubah pecahan: $ 5\\frac{5}{8} = \\frac{45}{8} $. <br> Kalikan: $ \\frac{45}{8} \\times \\frac{4}{15} $ <br> Lakukan simplifikasi silang: $ 45 \\div 15 = 3 $ dan $ 8 \\div 4 = 2 $. Diperoleh hasil akhir $ \\frac{3}{2} = 1\\frac{1}{2} $."
+            },
+            {
+                id: 16,
+                type: "Cerita",
+                text: "Ibu memiliki persediaan gula pasir sebanyak $ 2\\frac{1}{2} $ kg. Jika Ibu ingin membagi gula tersebut ke dalam beberapa kantong plastik yang masing-masing berisi $ \\frac{1}{4} $ kg, berapa banyak kantong plastik yang dibutuhkan Ibu?",
+                options: ["$ 10 $ kantong", "$ 8 $ kantong", "$ 5 $ kantong", "$ 12 $ kantong"],
+                answer: "$ 10 $ kantong",
+                hint: "Ini adalah kasus pembagian. Jumlah seluruh persediaan dibagi dengan takaran isi per kantong plastik: $ 2\\frac{1}{2} \\div \\frac{1}{4} $.",
+                explanation: "Langkah penyelesaian: <br> Konversi persediaan: $ 2\\frac{1}{2} $ kg = $ \\frac{5}{2} $ kg. <br> Pembagian kantong: $ \\frac{5}{2} \\div \\frac{1}{4} = \\frac{5}{2} \\times 4 = \\frac{20}{2} = 10 $ kantong."
+            },
+            {
+                id: 17,
+                type: "Cerita",
+                text: "Pak Tani memiliki sebidang lahan pertanian seluas $ \\frac{4}{5} $ hektar. Setengah dari lahan tersebut akan ditanami jagung. Berapa hektar lahan yang akan ditanami jagung oleh Pak Tani?",
+                options: ["$ \\frac{2}{5} $ hektar", "$ \\frac{1}{5} $ hektar", "$ \\frac{4}{10} $ hektar", "$ \\frac{3}{5} $ hektar"],
+                answer: "$ \\frac{2}{5} $ hektar",
+                hint: "Kata 'setengah dari' mengindikasikan operasi perkalian pecahan. Lakukan perkalian: $ \\frac{1}{2} \\times \\frac{4}{5} $.",
+                explanation: "Langkah penyelesaian: <br> Perkalian: $ \\frac{1}{2} \\times \\frac{4}{5} = \\frac{4}{10} $. <br> Sederhanakan pembilang dan penyebut dibagi dengan $ 2 $ diperoleh hasil akhir $ \\frac{2}{5} $ hektar."
+            },
+            {
+                id: 18,
+                type: "Cerita",
+                text: "Sebuah mobil memerlukan $ \\frac{3}{40} $ liter bensin untuk menempuh jarak sejauh 1 km. Berapa liter bensin yang diperlukan mobil tersebut untuk menempuh jarak $ 12 $ km?",
+                options: ["$ \\frac{9}{10} $ liter", "$ \\frac{36}{40} $ liter", "$ 1\\frac{1}{10} $ liter", "$ \\frac{3}{5} $ liter"],
+                answer: "$ \\frac{9}{10} $ liter",
+                hint: "Kalikan kebutuhan bensin per kilometer dengan total jarak tempuh mobil tersebut: $ \\frac{3}{40} \\times 12 $.",
+                explanation: "Langkah penyelesaian: <br> Perkalian: $ \\frac{3}{40} \\times 12 = \\frac{36}{40} $. <br> Sederhanakan pecahan dengan membagi pembilang dan penyebut dengan $ 4 $ diperoleh hasil akhir $ \\frac{9}{10} $ liter."
+            },
+            {
+                id: 19,
+                type: "Cerita",
+                text: "Di suatu kelas, $ \\frac{2}{5} $ bagian dari total siswa adalah laki-laki. Jika setengah dari siswa laki-laki tersebut berkacamata, berapa bagian dari seluruh siswa di kelas yang merupakan laki-laki berkacamata?",
+                options: ["$ \\frac{1}{5} $ bagian", "$ \\frac{2}{10} $ bagian", "$ \\frac{3}{10} $ bagian", "$ \\frac{1}{2} $ bagian"],
+                answer: "$ \\frac{1}{5} $ bagian",
+                hint: "Lakukan perkalian antara bagian laki-laki kelas dengan porsi berkacamata: $ \\frac{1}{2} \\times \\frac{2}{5} $.",
+                explanation: "Langkah penyelesaian: <br> Perkalian bagian: $ \\frac{1}{2} \\times \\frac{2}{5} = \\frac{2}{10} $. <br> Sederhanakan pecahan tersebut diperoleh hasil akhir $ \\frac{1}{5} $ bagian dari total siswa."
+            },
+            {
+                id: 20,
+                type: "Cerita",
+                text: "Seutas tali sepanjang $ 7\\frac{1}{2} $ meter akan dipotong menjadi beberapa bagian yang sama panjang. Jika panjang setiap potongan adalah $ \\frac{3}{4} $ meter, berapa banyak potongan tali yang diperoleh?",
+                options: ["$ 10 $ potong", "$ 8 $ potong", "$ 12 $ potong", "$ 9 $ potong"],
+                answer: "$ 10 $ potong",
+                hint: "Lakukan operasi pembagian dari panjang total tali dengan ukuran per potongan: $ 7\\frac{1}{2} \\div \\frac{3}{4} $.",
+                explanation: "Langkah penyelesaian: <br> Konversi total: $ 7\\frac{1}{2} = \\frac{15}{2} $. <br> Pembagian: $ \\frac{15}{2} \\div \\frac{3}{4} = \\frac{15}{2} \\times \\frac{4}{3} $ <br> Kalikan langsung atau silang: $ \\frac{60}{6} = 10 $ potong tali."
+            },
+            // --- 10 SOAL CAMPURAN DENGAN TAMBAH & KURANG (21-30) ---
+            {
+                id: 21,
+                type: "Langsung",
+                text: "Hitunglah hasil dari penjumlahan pecahan biasa berikut! <br> $ \\frac{3}{8} + \\frac{1}{4} = ... $",
+                options: ["$ \\frac{5}{8} $", "$ \\frac{4}{12} $", "$ \\frac{4}{8} $", "$ \\frac{3}{4} $"],
+                answer: "$ \\frac{5}{8} $",
+                hint: "Samakan penyebutnya terlebih dahulu dengan mencari KPK dari $ 8 $ dan $ 4 $, yaitu $ 8 $.",
+                explanation: "Langkah penyelesaian: <br> Ubah pecahan kedua: $ \\frac{1}{4} = \\frac{2}{8} $. <br> Jumlahkan: $ \\frac{3}{8} + \\frac{2}{8} = \\frac{5}{8} $."
+            },
+            {
+                id: 22,
+                type: "Langsung",
+                text: "Tentukan sisa hasil dari pengurangan pecahan campuran berikut! <br> $ 1\\frac{1}{2} - \\frac{2}{3} = ... $",
+                options: ["$ \\frac{5}{6} $", "$ 1 $", "$ \\frac{1}{2} $", "$ \\frac{1}{3} $"],
+                answer: "$ \\frac{5}{6} $",
+                hint: "Ubah pecahan campuran $ 1\\frac{1}{2} $ menjadi $ \\frac{3}{2} $, lalu samakan penyebutnya menjadi per-enam ($ 6 $).",
+                explanation: "Langkah penyelesaian: <br> $ 1\\frac{1}{2} = \\frac{3}{2} = \\frac{9}{6} $. <br> $ \\frac{2}{3} = \\frac{4}{6} $. <br> Lakukan pengurangan: $ \\frac{9}{6} - \\frac{4}{6} = \\frac{5}{6} $."
+            },
+            {
+                id: 23,
+                type: "Langsung",
+                text: "Selesaikan operasi campuran KABATAKU berikut! <br> $ \\frac{1}{2} \\times \\frac{2}{3} + \\frac{1}{6} = ... $",
+                options: ["$ \\frac{1}{2} $", "$ \\frac{3}{6} $", "$ \\frac{2}{3} $", "$ \\frac{1}{3} $"],
+                answer: "$ \\frac{1}{2} $",
+                hint: "Prioritaskan perkalian terlebih dahulu sebelum melakukan penjumlahan. Hitung $ \\frac{1}{2} \\times \\frac{2}{3} $ baru ditambahkan $ \\frac{1}{6} $.",
+                explanation: "Langkah penyelesaian: <br> Kalikan: $ \\frac{1}{2} \\times \\frac{2}{3} = \\frac{2}{6} = \\frac{1}{3} $. <br> Jumlahkan: $ \\frac{2}{6} + \\frac{1}{6} = \\frac{3}{6} = \\frac{1}{2} $."
+            },
+            {
+                id: 24,
+                type: "Langsung",
+                text: "Tentukan hasil akhir dari hitungan KABATAKU berikut! <br> $ \\frac{3}{4} \\div \\frac{1}{2} - \\frac{1}{3} = ... $",
+                options: ["$ 1\\frac{1}{6} $", "$ \\frac{7}{6} $", "$ \\frac{1}{2} $", "$ \\frac{2}{3} $"],
+                answer: "$ 1\\frac{1}{6} $",
+                hint: "Kerjakan operasi pembagian terlebih dahulu dengan membalik pecahan pembagi, kemudian kurangi hasilnya dengan $ \\frac{1}{3} $.",
+                explanation: "Langkah penyelesaian: <br> Pembagian: $ \\frac{3}{4} \\div \\frac{1}{2} = \\frac{3}{4} \\times 2 = \\frac{6}{4} = \\frac{3}{2} $. <br> Pengurangan: $ \\frac{3}{2} - \\frac{1}{3} = \\frac{9}{6} - \\frac{2}{6} = \\frac{7}{6} = 1\\frac{1}{6} $."
+            },
+            {
+                id: 25,
+                type: "Langsung",
+                text: "Hitunglah hasil operasi pecahan campuran berikut ini! <br> $ 2 - \\frac{1}{3} \\times \\frac{3}{4} = ... $",
+                options: ["$ 1\\frac{3}{4} $", "$ 1\\frac{1}{4} $", "$ 1\\frac{2}{3} $", "$ \\frac{5}{4} $"],
+                answer: "$ 1\\frac{3}{4} $",
+                hint: "Berdasarkan tata aturan prioritas KABATAKU, selesaikan perkalian antara $ \\frac{1}{3} \\times \\frac{3}{4} $ sebelum melakukan pengurangan dari angka $ 2 $.",
+                explanation: "Langkah penyelesaian: <br> Perkalian: $ \\frac{1}{3} \\times \\frac{3}{4} = \\frac{1}{4} $. <br> Pengurangan: $ 2 - \\frac{1}{4} = \\frac{8}{4} - \\frac{1}{4} = \\frac{7}{4} = 1\\frac{3}{4} $."
+            },
+            {
+                id: 26,
+                type: "Cerita",
+                text: "Andi memiliki $ \\frac{3}{4} $ loyang kue. Adiknya memakan $ \\frac{1}{4} $ loyang dari kue tersebut. Keesokan harinya, Ibu memberikan lagi $ \\frac{1}{2} $ loyang kue kepada Andi. Berapa bagian loyang kue Andi sekarang?",
+                options: ["$ 1 $ loyang", "$ \\frac{1}{2} $ loyang", "$ 1\\frac{1}{2} $ loyang", "$ \\frac{3}{4} $ loyang"],
+                answer: "$ 1 $ loyang",
+                hint: "Soal cerita ini menggunakan operasi pengurangan lalu penjumlahan: $ \\frac{3}{4} - \\frac{1}{4} + \\frac{1}{2} $.",
+                explanation: "Langkah penyelesaian: <br> Lakukan pengurangan kue dimakan: $ \\frac{3}{4} - \\frac{1}{4} = \\frac{2}{4} = \\frac{1}{2} $. <br> Jumlahkan pemberian Ibu: $ \\frac{1}{2} + \\frac{1}{2} = 1 $ loyang kue utuh."
+            },
+            {
+                id: 27,
+                type: "Cerita",
+                text: "Sinta memiliki pita sepanjang $ 1\\frac{1}{2} $ meter. Ia membeli lagi pita sepanjang $ 2\\frac{1}{4} $ meter. Sinta kemudian menggunakan pita tersebut sepanjang $ 1\\frac{3}{4} $ meter untuk menghias kado. Berapa meter sisa pita Sinta sekarang?",
+                options: ["$ 2 $ meter", "$ 1\\frac{3}{4} $ meter", "$ 2\\frac{1}{2} $ meter", "$ 1 $ meter"],
+                answer: "$ 2 $ meter",
+                hint: "Lakukan penjumlahan persediaan pita, kemudian kurangi dengan pita yang digunakan: $ 1\\frac{1}{2} + 2\\frac{1}{4} - 1\\frac{3}{4} $.",
+                explanation: "Langkah penyelesaian: <br> Ubah semua ke per-empat: $ \\frac{6}{4} + \\frac{9}{4} - \\frac{7}{4} $. <br> Jumlahkan: $ \\frac{6+9}{4} = \\frac{15}{4} $. <br> Kurangi: $ \\frac{15-7}{4} = \\frac{8}{4} = 2 $ meter pita."
+            },
+            {
+                id: 28,
+                type: "Cerita",
+                text: "Pak Budi memanen $ \\frac{5}{6} $ kuintal beras. Sebanyak $ \\frac{1}{3} $ kuintal beras diberikan kepada Paman, lalu sisanya dibagikan rata kepada 2 orang tetangganya yang membutuhkan. Berapa kuintal beras yang diterima masing-masing tetangga?",
+                options: ["$ \\frac{1}{4} $ kuintal", "$ \\frac{1}{2} $ kuintal", "$ \\frac{1}{3} $ kuintal", "$ \\frac{2}{3} $ kuintal"],
+                answer: "$ \\frac{1}{4} $ kuintal",
+                hint: "Hitung sisa beras setelah diberikan ke paman terlebih dahulu $ \\left(\\frac{5}{6} - \\frac{1}{3}\\right) $, kemudian bagi hasilnya dengan angka $ 2 $.",
+                explanation: "Langkah penyelesaian: <br> Sisa beras: $ \\frac{5}{6} - \\frac{2}{6} = \\frac{3}{6} = \\frac{1}{2} $ kuintal. <br> Distribusi tetangga: $ \\frac{1}{2} \\div 2 = \\frac{1}{2} \\times \\frac{1}{2} = \\frac{1}{4} $ kuintal."
+            },
+            {
+                id: 29,
+                type: "Cerita",
+                text: "Rina memiliki 2 botol sirup coco pandan, masing-masing berisi $ \\frac{3}{4} $ liter sirup. Ia menuangkan semua sirup ke dalam wadah besar, lalu mengambil $ \\frac{1}{2} $ liter untuk disajikan ke temannya. Berapa sisa sirup di dalam wadah besar tersebut?",
+                options: ["$ 1 $ liter", "$ 1\\frac{1}{2} $ liter", "$ \\frac{3}{4} $ liter", "$ \\frac{1}{2} $ liter"],
+                answer: "$ 1 $ liter",
+                hint: "Kalikan jumlah botol dengan isinya terlebih dahulu, kemudian kurangi dengan sirup yang diambil Rina: $ 2 \\times \\frac{3}{4} - \\frac{1}{2} $.",
+                explanation: "Langkah penyelesaian: <br> Total awal: $ 2 \\times \\frac{3}{4} = \\frac{6}{4} = \\frac{3}{2} $ liter. <br> Sisa sirup: $ \\frac{3}{2} - \\frac{1}{2} = \\frac{2}{2} = 1 $ liter sirup."
+            },
+            {
+                id: 30,
+                type: "Cerita",
+                text: "Luas sebidang tanah milik Kakek adalah $ 10 $ hektar. Sebanyak $ \\frac{2}{5} $ bagian dari tanah tersebut dibangun rumah, dan sisanya ditanami pohon buah-buahan. Berapa hektar tanah yang ditanami pohon oleh Kakek?",
+                options: ["$ 6 $ hektar", "$ 4 $ hektar", "$ 5 $ hektar", "$ 8 $ hektar"],
+                answer: "$ 6 $ hektar",
+                hint: "Hitung luas tanah untuk rumah terlebih dahulu $ 10 \\times \\frac{2}{5} $, lalu kurangi total luas tanah kakek dengan hasil luas rumah tersebut.",
+                explanation: "Langkah penyelesaian: <br> Luas tanah untuk rumah: $ 10 \\times \\frac{2}{5} = \\frac{20}{5} = 4 $ hektar. <br> Sisa tanah pohon buah: $ 10 - 4 = 6 $ hektar."
+            }
+        ];
+
+        const GameState = {
+            playerName: "Alkemis Muda",
+            avatar: "🧙‍♂️",
+            currentQuestionIdx: 0, // 0 to 29
+            score: 0,
+            hasAnswered: false,
+            userAnswers: {}, // key: questionId, value: { chosen: string, isCorrect: boolean }
+            showedHint: {} // key: questionId, value: boolean
+        };
+
+        // Render mathematical formulas inside elements using KaTeX
+        function renderMath(element) {
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(element || document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+    </script>
+
+    <header class="bg-white border-b-4 border-teal-500 px-4 py-3 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="bg-teal-500 hover:bg-teal-600 text-white p-2.5 rounded-xl border-2 border-slate-900 comic-shadow-sm comic-btn-active transition-all">
+                    <i class="fa-solid fa-map-location-dot text-lg"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl animate-pulse">🧪</span>
+                    <div>
+                        <h1 class="title-font font-black text-lg sm:text-xl text-teal-950 leading-none tracking-wide">LAB ALKIMIA PECAHAN</h1>
+                        <span class="text-xs text-slate-500 font-bold">Misi Evaluasi 30 Soal SMP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HUD Score & Profile info -->
+            <div class="flex items-center gap-3 bg-teal-50 px-3 py-1.5 rounded-2xl border-2 border-slate-900 comic-shadow-sm">
+                <div class="flex items-center gap-1.5">
+                    <span id="hud-avatar" class="w-7 h-7 rounded-full bg-teal-200 flex items-center justify-center border-2 border-slate-900 text-sm">🧙‍♂️</span>
+                    <span id="hud-name" class="text-xs font-bold text-teal-950">Alkemis Muda</span>
+                </div>
+                <div class="h-5 w-[2px] bg-slate-900"></div>
+                <div class="flex items-center gap-1 text-teal-700 font-extrabold text-xs">
+                    <i class="fa-solid fa-gem animate-bounce text-teal-500"></i>
+                    <span id="hud-score">0 XP</span>
+                </div>
+                <div class="h-5 w-[2px] bg-slate-900"></div>
+                <div class="text-[10px] text-teal-950 font-black bg-white px-2.5 py-0.5 rounded-lg border border-slate-900">
+                    Misi <span id="hud-slide-num">1</span>/30
+                </div>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto w-full bg-slate-200 h-2.5 mt-3 rounded-full overflow-hidden border-2 border-slate-900">
+            <div id="main-progress-bar" class="bg-gradient-to-r from-teal-500 via-sky-400 to-indigo-500 h-full transition-all duration-300" style="width: 3.33%"></div>
+        </div>
+    </header>
+
+    <div id="sidebar" class="fixed left-0 top-0 bottom-0 w-80 bg-teal-50 border-r-4 border-slate-900 z-[100] transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <div class="p-4 border-b-2 border-slate-900 flex justify-between items-center bg-teal-200">
+            <div class="flex items-center gap-2 text-teal-950 font-extrabold text-lg">
+                <i class="fa-solid fa-compass text-teal-700"></i>
+                <span>Kompas Evaluasi Lab</span>
+            </div>
+            <button onclick="toggleSidebar()" class="text-slate-800 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-gradient-to-b from-teal-50 to-sky-50" id="sidebar-mission-list">
+            <!-- Shuffled or sequence dynamic question list -->
+        </div>
+        <div class="p-4 border-t-2 border-slate-900 bg-teal-200 text-center text-xs text-teal-950 font-bold">
+            Evaluasi Gabungan • SMP Kelas VII
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center items-center">
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-container" class="w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 comic-shadow flex flex-col justify-between max-w-2xl">
+            <div class="text-center space-y-4">
+                <span class="text-teal-950 font-black uppercase tracking-widest text-xs bg-teal-300 px-4 py-1.5 rounded-full border-2 border-slate-900 animate-pulse">Ujian Evaluasi Kelulusan</span>
+                <h2 class="title-font text-3xl md:text-4xl font-black bg-gradient-to-r from-teal-600 via-sky-500 to-indigo-600 bg-clip-text text-transparent">Uji Kemandirian Alkemis</h2>
+                <p class="text-slate-600 text-sm font-medium leading-relaxed">
+                    Selamat datang di ujian laboratorium alkimia! Kamu ditantang menyelesaikan <strong>30 kasus evaluasi pecahan</strong> secara mandiri. Sepuluh soal terakhir akan menguji pemahaman gabunganmu dengan operasi penjumlahan dan pengurangan!
+                </p>
+                <div class="flex justify-center py-4 animate-float">
+                    <svg class="w-32 h-32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="liqGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#2dd4bf" />
+                                <stop offset="100%" stop-color="#0f766e" />
+                            </radialGradient>
+                        </defs>
+                        <path d="M70,30 H130 V50 H70 Z" fill="#334155" stroke="#0f172a" stroke-width="4"/>
+                        <path d="M90,50 L60,150 A45,45 0 0,0 140,150 L110,50 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
+                        <path d="M68,125 L132,125 A45,45 0 0,1 120,165 A45,45 0 0,1 80,165 Z" fill="url(#liqGrad)"/>
+                        <circle cx="100" cy="115" r="7" fill="#fff" opacity="0.6"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="space-y-4 bg-teal-50 p-5 rounded-2xl border-2 border-slate-900 comic-shadow-sm max-w-md mx-auto w-full">
+                <div>
+                    <label class="block text-xs text-teal-950 font-black uppercase tracking-wider mb-1.5">Identitas Alkemis</label>
+                    <input type="text" id="player-name-input" placeholder="Tulis nama panggilanmu..." class="w-full px-4 py-2 rounded-xl bg-white border-2 border-slate-900 text-slate-800 text-center font-bold focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-xs text-teal-950 font-black uppercase tracking-wider mb-2">Pilih Karakter</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="selectAvatar('wizard', '🧙‍♂️')" class="avatar-opt p-2 bg-teal-300 border-2 border-slate-900 rounded-xl text-xl hover:bg-teal-200 comic-btn-active transition-all">🧙‍♂️</button>
+                        <button onclick="selectAvatar('witch', '🧙‍♀️')" class="avatar-opt p-2 bg-white border-2 border-slate-900 rounded-xl text-xl hover:bg-teal-200 comic-btn-active transition-all">🧙‍♀️</button>
+                        <button onclick="selectAvatar('fae', '🧚')" class="avatar-opt p-2 bg-white border-2 border-slate-900 rounded-xl text-xl hover:bg-teal-200 comic-btn-active transition-all">🧚</button>
+                        <button onclick="selectAvatar('dragon', '🐉')" class="avatar-opt p-2 bg-white border-2 border-slate-900 rounded-xl text-xl hover:bg-teal-200 comic-btn-active transition-all">🐉</button>
+                    </div>
+                </div>
+                <button onclick="startQuiz()" class="w-full py-3 bg-gradient-to-r from-teal-400 to-indigo-400 hover:from-teal-500 hover:to-indigo-500 border-2 border-slate-900 rounded-xl font-black text-sm text-slate-900 tracking-wider comic-shadow-sm comic-btn-active transition-all mt-2">
+                    MULAI MISI EVALUASI <i class="fa-solid fa-flask"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Play Screen -->
+        <div id="quiz-container" class="w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 comic-shadow flex flex-col justify-between min-h-[500px] max-w-3xl hidden">
+            
+            <div class="space-y-4">
+                <!-- Question Header Status -->
+                <div class="flex justify-between items-center border-b-2 border-dashed border-slate-300 pb-3">
+                    <span id="question-type" class="bg-indigo-100 text-indigo-900 text-[10px] px-3 py-1 rounded-full font-black border border-indigo-200 uppercase tracking-widest">SOAL LANGSUNG</span>
+                    <span class="text-xs text-slate-500 font-bold">Gelar: <strong id="dynamic-grade-name" class="text-teal-700">Magang</strong></span>
+                </div>
+
+                <!-- Mathematical Question Content -->
+                <div class="space-y-3">
+                    <p id="question-text" class="text-slate-800 text-sm sm:text-base md:text-lg font-bold leading-relaxed">
+                        Loading questions...
+                    </p>
+                </div>
+
+                <!-- Multiple Choice Options Grid -->
+                <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+                    <!-- Dynamic choices injected here -->
+                </div>
+
+                <!-- Guided Learning Hints Drawer -->
+                <div class="pt-2">
+                    <div class="flex justify-center">
+                        <button id="btn-toggle-hint" onclick="toggleHint()" class="px-4 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-black rounded-xl border-2 border-slate-900 text-xs transition-all comic-shadow-sm comic-btn-active flex items-center gap-1.5">
+                            <i class="fa-solid fa-lightbulb"></i> <span id="hint-btn-text">Butuh Petunjuk Alkemis?</span>
+                        </button>
+                    </div>
+                    <div id="hint-box" class="hidden mt-3 bg-amber-50/70 p-4 rounded-xl border-2 border-slate-900 text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed">
+                        <!-- Hint Text -->
+                    </div>
+                </div>
+
+                <!-- Realtime Rational Explanation Output -->
+                <div id="explanation-container" class="hidden mt-2 bg-teal-50 p-4 rounded-2xl border-2 border-slate-900">
+                    <div class="flex items-start gap-2.5">
+                        <span class="text-2xl">📝</span>
+                        <div>
+                            <span class="font-black text-xs text-teal-950 uppercase tracking-wider block">Catatan Log Alkimia Pecahan</span>
+                            <p id="explanation-text" class="text-xs sm:text-sm text-teal-900 font-medium leading-relaxed mt-1">
+                                Penjelasan detail jawaban...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Footer Control -->
+            <footer class="mt-8 pt-4 border-t-2 border-slate-900 flex justify-between items-center bg-white">
+                <button id="btn-prev" onclick="navigateQuestion(-1)" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-900 font-black text-xs text-slate-800 transition-all flex items-center gap-1.5 comic-shadow-sm comic-btn-active">
+                    <i class="fa-solid fa-chevron-left"></i> Soal Sebelumnya
+                </button>
+                <div class="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    SOAL <span id="current-index-num">1</span> DARI 30
+                </div>
+                <button id="btn-next" onclick="navigateQuestion(1)" class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-400 to-sky-400 hover:from-teal-500 hover:to-sky-500 border-2 border-slate-900 text-slate-900 font-black text-xs transition-all flex items-center gap-1.5 comic-shadow-sm comic-btn-active">
+                    <span id="btn-next-text">Soal Berikutnya</span> <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </footer>
+        </div>
+
+        <!-- Result Score Card & Evaluation Report -->
+        <div id="result-container" class="w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 comic-shadow max-w-2xl text-center space-y-6 hidden">
+            <div class="space-y-2">
+                <span class="text-teal-950 font-black bg-teal-300 px-4 py-1.5 rounded-full border-2 border-slate-900 text-xs">HASIL EVALUASI SELESAI</span>
+                <h3 class="title-font text-3xl md:text-4xl font-black bg-gradient-to-r from-teal-600 via-sky-500 to-indigo-500 bg-clip-text text-transparent">REKAPITULASI ALKEMIS</h3>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 max-w-md mx-auto font-bold">
+                <div class="bg-teal-50 p-4 rounded-2xl border-2 border-slate-900 text-center">
+                    <span class="text-xs text-teal-950 uppercase tracking-wider block">Poin Energi XP</span>
+                    <span id="result-score" class="text-3xl font-black text-teal-800">0 XP</span>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-2xl border-2 border-slate-900 text-center">
+                    <span class="text-xs text-indigo-950 uppercase tracking-wider block">Ketepatan Jawaban</span>
+                    <span id="result-accuracy" class="text-3xl font-black text-indigo-800">0/30</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Evaluation Message -->
+            <div class="bg-slate-50 p-5 rounded-2xl border-2 border-slate-900 text-slate-700 text-sm font-medium leading-relaxed max-w-md mx-auto">
+                <span class="text-2xl block mb-1">🎓</span>
+                <p id="evaluation-message">
+                    Analisis hasil belajar alkemis sedang dihitung...
+                </p>
+            </div>
+
+            <!-- Certificate Section with Medieval details -->
+            <div class="max-w-md mx-auto bg-[#fffbeb] p-6 rounded-2xl border-4 border-slate-900 space-y-4 shadow-xl relative overflow-hidden">
+                <div class="absolute -top-10 -left-10 w-24 h-24 bg-teal-300/20 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-indigo-300/20 rounded-full blur-2xl"></div>
+                
+                <div class="flex justify-center">
+                    <span class="text-6xl animate-bounce">🏆</span>
+                </div>
+                <h4 class="font-black text-md sm:text-lg text-slate-800 title-font">Sertifikat Kelulusan Evaluasi Lab</h4>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Dianugerahkan Kepada:</p>
+                <p id="cert-name" class="text-2xl font-black text-teal-950 underline tracking-wide">Siswa Hebat</p>
+                <p class="text-[11px] text-slate-700 font-bold leading-relaxed">
+                    Telah menuntaskan 30 tantangan komparasi pecahan langsung & cerita, serta menguasai integrasi kalkulasi perkalian, pembagian, penjumlahan, dan pengurangan di SMP!
+                </p>
+            </div>
+
+            <!-- Retry button container -->
+            <div class="flex justify-center gap-3">
+                <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 border-2 border-slate-900 rounded-xl font-black text-xs text-slate-800 transition-all comic-shadow-sm comic-btn-active">
+                    <i class="fa-solid fa-rotate-left"></i> Ulangi Evaluasi
+                </button>
+                <button onclick="toggleSidebar(true)" class="px-6 py-3 bg-teal-400 hover:bg-teal-500 border-2 border-slate-900 rounded-xl font-black text-xs text-slate-900 transition-all comic-shadow-sm comic-btn-active">
+                    <i class="fa-solid fa-list-check"></i> Review Jawaban
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[200] space-y-2 pointer-events-none"></div>
+
+    <script>
+        // Custom interactive toasts
+        function showNotification(text, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl border-2 border-slate-900 flex items-center gap-3 text-xs font-black shadow-lg transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto max-w-xs ${
+                type === 'success' ? 'bg-emerald-100 text-emerald-900' :
+                type === 'error' ? 'bg-red-100 text-red-900' :
+                'bg-teal-100 text-teal-950'
+            }`;
+            
+            const icon = type === 'success' ? '🔮' : type === 'error' ? '🧪' : 'ℹ️';
+            toast.innerHTML = `<span class="text-2xl">${icon}</span> <span>${text}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Handle Avatar Selection
+        function selectAvatar(id, emoji) {
+            SoundFX.playClick();
+            GameState.avatar = emoji;
+            document.getElementById('hud-avatar').textContent = emoji;
+            
+            document.querySelectorAll('.avatar-opt').forEach(btn => {
+                btn.classList.remove('bg-teal-300');
+            });
+            event.currentTarget.classList.add('bg-teal-300');
+            showNotification(`Karaktermu berubah menjadi ${emoji}!`, "success");
+        }
+
+        // Toggle Sidebar
+        function toggleSidebar(forcedState) {
+            SoundFX.playClick();
+            const sb = document.getElementById('sidebar');
+            if (forcedState !== undefined) {
+                if (forcedState) sb.classList.remove('-translate-x-full');
+                else sb.classList.add('-translate-x-full');
+            } else {
+                sb.classList.toggle('-translate-x-full');
+            }
+        }
+
+        // Start Quiz Trigger
+        function startQuiz() {
+            SoundFX.playClick();
+            const nameInput = document.getElementById('player-name-input').value.trim();
+            if (nameInput) {
+                GameState.playerName = nameInput;
+                document.getElementById('hud-name').textContent = nameInput;
+                document.getElementById('cert-name').textContent = nameInput;
+            }
+
+            document.getElementById('welcome-container').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+
+            renderCurrentQuestion();
+            buildSidebarList();
+            showNotification("Misi Evaluasi Lab resmi dimulai! Semoga sukses!", "info");
+        }
+
+        // Render Current Question
+        function renderCurrentQuestion() {
+            const currentQuestion = QuestionsDatabase[GameState.currentQuestionIdx];
+            
+            // HUD & Numbers Update
+            document.getElementById('hud-slide-num').textContent = GameState.currentQuestionIdx + 1;
+            document.getElementById('current-index-num').textContent = GameState.currentQuestionIdx + 1;
+            
+            const progressPct = ((GameState.currentQuestionIdx + 1) / QuestionsDatabase.length) * 100;
+            document.getElementById('main-progress-bar').style.width = `${progressPct}%`;
+
+            // Back button control
+            document.getElementById('btn-prev').style.opacity = GameState.currentQuestionIdx === 0 ? '0.3' : '1';
+            document.getElementById('btn-prev').disabled = GameState.currentQuestionIdx === 0;
+
+            // Next / Finish button title control
+            const isLast = GameState.currentQuestionIdx === QuestionsDatabase.length - 1;
+            document.getElementById('btn-next-text').textContent = isLast ? "Selesaikan Ujian" : "Soal Berikutnya";
+
+            // Update dynamically Grade title name based on progress
+            const gradeName = document.getElementById('dynamic-grade-name');
+            if (GameState.currentQuestionIdx < 10) {
+                gradeName.textContent = "Alkemis Magang";
+                gradeName.className = "text-teal-700 font-bold";
+            } else if (GameState.currentQuestionIdx < 20) {
+                gradeName.textContent = "Ahli Racikan";
+                gradeName.className = "text-sky-700 font-bold";
+            } else {
+                gradeName.textContent = "Grandmaster";
+                gradeName.className = "text-indigo-700 font-bold";
+            }
+
+            // Render Text
+            document.getElementById('question-type').textContent = `${currentQuestion.id <= 20 ? 'OPERASI X & :' : 'GABUNGAN + - x :'} • ${currentQuestion.type}`;
+            const questionTextEl = document.getElementById('question-text');
+            questionTextEl.innerHTML = currentQuestion.text;
+
+            // Reset Hint container
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('hint-btn-text').textContent = "Butuh Petunjuk Alkemis?";
+            document.getElementById('hint-box').innerHTML = currentQuestion.hint;
+
+            // Render Choices
+            renderChoices(currentQuestion);
+
+            // Re-render Math safely (Essential for displaying mathematical symbols inline)
+            setTimeout(() => {
+                renderMath(document.getElementById('quiz-container'));
+            }, 10);
+        }
+
+        // Render Choices
+        function renderChoices(question) {
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = "";
+
+            const hasAnswered = GameState.userAnswers.hasOwnProperty(question.id);
+            const savedAnswer = GameState.userAnswers[question.id];
+
+            // Shuffling logic per Question (Only once per quiz lifecycle if not saved yet)
+            if (!question.shuffledOptions) {
+                const shuffled = [...question.options];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                question.shuffledOptions = shuffled;
+            }
+
+            question.shuffledOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "p-3.5 bg-white hover:bg-teal-50 border-2 border-slate-900 rounded-2xl font-bold text-slate-800 text-xs sm:text-sm text-center transition-all comic-shadow-sm comic-btn-active";
+                btn.innerHTML = opt;
+
+                if (hasAnswered) {
+                    btn.disabled = true;
+                    if (opt === question.answer) {
+                        btn.className = "p-3.5 bg-emerald-200 border-2 border-slate-900 rounded-2xl font-bold text-slate-900 text-xs sm:text-sm text-center";
+                    } else if (opt === savedAnswer.chosen) {
+                        btn.className = "p-3.5 bg-red-200 border-2 border-slate-900 rounded-2xl font-bold text-slate-900 text-xs sm:text-sm text-center opacity-70";
+                    } else {
+                        btn.className = "p-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl font-bold text-slate-400 text-xs sm:text-sm text-center opacity-40 cursor-not-allowed";
+                    }
+                } else {
+                    btn.onclick = () => chooseAnswer(question.id, opt, btn);
+                }
+
+                grid.appendChild(btn);
+            });
+
+            // Handle explanation view state
+            const expContainer = document.getElementById('explanation-container');
+            const expText = document.getElementById('explanation-text');
+            if (hasAnswered) {
+                expContainer.classList.remove('hidden');
+                expText.innerHTML = question.explanation;
+            } else {
+                expContainer.classList.add('hidden');
+            }
+        }
+
+        // Handle User Answer Selection
+        function chooseAnswer(questionId, chosenOpt, buttonElement) {
+            const question = QuestionsDatabase.find(q => q.id === questionId);
+            const isCorrect = chosenOpt === question.answer;
+
+            // Score logic: 100 XP if correct on first try, 50 XP if used hints, 0 XP if wrong.
+            let points = 0;
+            const hintUsed = GameState.showedHint[questionId] === true;
+            if (isCorrect) {
+                SoundFX.playSuccess();
+                points = hintUsed ? 50 : 100;
+                GameState.score += points;
+                showNotification(`Benar! Energi reaksi seimbang! (+${points} XP)`, "success");
+            } else {
+                SoundFX.playWrong();
+                showNotification("Aduh, ramuan meledak karena hitungan keliru!", "error");
+            }
+
+            // Save state
+            GameState.userAnswers[questionId] = {
+                chosen: chosenOpt,
+                isCorrect: isCorrect,
+                pointsAwarded: points
+            };
+
+            // Update HUD score immediately
+            document.getElementById('hud-score').innerHTML = `<i class="fa-solid fa-gem animate-bounce text-teal-500"></i> ${GameState.score} XP`;
+
+            // Refresh Question UI to lock options & show explanation
+            renderCurrentQuestion();
+            buildSidebarList();
+        }
+
+        // Navigate questions
+        function navigateQuestion(direction) {
+            SoundFX.playClick();
+            const targetIdx = GameState.currentQuestionIdx + direction;
+
+            if (targetIdx >= 0 && targetIdx < QuestionsDatabase.length) {
+                GameState.currentQuestionIdx = targetIdx;
+                renderCurrentQuestion();
+            } else if (targetIdx === QuestionsDatabase.length) {
+                evaluateAndFinishQuiz();
+            }
+        }
+
+        // Jump directly to Question from Sidebar Map
+        function jumpToQuestion(idx) {
+            toggleSidebar(false);
+            GameState.currentQuestionIdx = idx;
+            renderCurrentQuestion();
+        }
+
+        // Toggle Hint Box
+        function toggleHint() {
+            SoundFX.playClick();
+            const box = document.getElementById('hint-box');
+            const text = document.getElementById('hint-btn-text');
+            const qId = QuestionsDatabase[GameState.currentQuestionIdx].id;
+
+            if (box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                text.textContent = "Sembunyikan Petunjuk Alkemis";
+                GameState.showedHint[qId] = true; // Mark hint as used for scoring limits
+            } else {
+                box.classList.add('hidden');
+                text.textContent = "Butuh Petunjuk Alkemis?";
+            }
+        }
+
+        // Build Sidebar Map List
+        function buildSidebarList() {
+            const list = document.getElementById('sidebar-mission-list');
+            list.innerHTML = "";
+
+            QuestionsDatabase.forEach((q, idx) => {
+                const isAnswered = GameState.userAnswers.hasOwnProperty(q.id);
+                const answerData = GameState.userAnswers[q.id];
+
+                let statusBadge = "🔒 Belum";
+                let btnStyle = "bg-white border-slate-200 text-slate-500 hover:border-slate-400 font-bold";
+
+                if (isAnswered) {
+                    if (answerData.isCorrect) {
+                        statusBadge = "✅ Sukses";
+                        btnStyle = "bg-emerald-50 border-emerald-400 text-emerald-800 font-black shadow-sm";
+                    } else {
+                        statusBadge = "❌ Gagal";
+                        btnStyle = "bg-red-50 border-red-400 text-red-800 font-black shadow-sm";
+                    }
+                } else if (idx === GameState.currentQuestionIdx) {
+                    statusBadge = "🧪 Aktif";
+                    btnStyle = "bg-teal-300 border-slate-900 text-slate-900 font-black shadow-sm";
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-2.5 rounded-xl border-2 flex items-center justify-between text-[11px] transition duration-200 ${btnStyle}`;
+                btn.onclick = () => jumpToQuestion(idx);
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-1.5">
+                        <span class="font-extrabold text-slate-400">${q.id}.</span>
+                        <span>Misi ${q.id <= 20 ? 'Pecahan Kali/Bagi' : 'KABATAKU Campur'}</span>
+                    </span>
+                    <span class="text-[9px] uppercase font-black px-1.5 py-0.5 rounded border bg-white border-slate-300">${statusBadge}</span>
+                `;
+
+                list.appendChild(btn);
+            });
+        }
+
+        // Finish Evaluation and Render Report
+        function evaluateAndFinishQuiz() {
+            SoundFX.playFanfare();
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-container').classList.remove('hidden');
+
+            const totalQuestions = QuestionsDatabase.length;
+            let correctCount = 0;
+
+            for (const key in GameState.userAnswers) {
+                if (GameState.userAnswers[key].isCorrect) {
+                    correctCount++;
+                }
+            }
+
+            // Render HUD
+            document.getElementById('result-score').textContent = `${GameState.score} XP`;
+            document.getElementById('result-accuracy').textContent = `${correctCount}/${totalQuestions}`;
+
+            // Message analysis
+            const msgEl = document.getElementById('evaluation-message');
+            if (correctCount === totalQuestions) {
+                msgEl.innerHTML = `<strong>Sempurna!</strong> Kamu telah menjawab seluruh 30 tantangan evaluasi dengan sangat akurat. Kamu resmi dianugerahi gelar <strong>Grandmaster Alkemis Pecahan Agung</strong>!`;
+            } else if (correctCount >= 20) {
+                msgEl.innerHTML = `<strong>Luar Biasa!</strong> Nilai kelulusanmu melampaui batas minimum. Kamu sukses mengatasi kerumitan perkalian, pembagian, serta pengerjaan logika operasi campuran SMP!`;
+            } else if (correctCount >= 15) {
+                msgEl.innerHTML = `<strong>Kerja Bagus!</strong> Kamu berhasil melampaui separuh rintangan lab. Sedikit latihan lagi mengenai prioritas KABATAKU dan konversi pecahan campuran akan membuatmu menjadi ahli!`;
+            } else {
+                msgEl.innerHTML = `<strong>Ayo Terus Berlatih!</strong> Hasil evaluasi menunjukkan kamu masih sering terkendala pada penyamaan penyebut KPK atau metode keep-change-flip. Klik tombol di bawah untuk mengulangi uji coba!`;
+            }
+
+            // Re-render KaTeX on evaluation message
+            setTimeout(() => {
+                renderMath(msgEl);
+            }, 10);
+        }
+
+        // Reset Quiz State
+        function resetQuiz() {
+            SoundFX.playClick();
+            GameState.currentQuestionIdx = 0;
+            GameState.score = 0;
+            GameState.userAnswers = {};
+            GameState.showedHint = {};
+
+            document.getElementById('hud-score').innerHTML = `<i class="fa-solid fa-gem animate-bounce text-teal-500"></i> 0 XP`;
+            document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+
+            renderCurrentQuestion();
+            buildSidebarList();
+        }
+
+        // Launch initialization on page window load
+        window.onload = function() {
+            SoundFX.init();
+            renderMath();
+        }
+    </script>
+</body>
+</html>
